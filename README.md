@@ -1,142 +1,121 @@
 # Product Reordering System
 
-This project is a product reordering system that determines which products need to be reordered based on their current stock, minimum stock, and expected demand.
+## Overzicht
+Dit project is een systeem voor het herbestellen van producten dat bepaalt welke producten moeten worden herbesteld op basis van hun huidige voorraad, minimale voorraad en verwachte vraag.
 
-## Features
+### Functies
+- Bepalen welke producten moeten worden herbesteld.
+- Ondersteuning voor meerdere producten met verschillende voorraadniveaus.
+- Unit tests om de correctheid van de herbestellogica te waarborgen.
+- Acceptatietests geschreven in Gherkin-syntaxis.
 
-- Determine which products need to be reordered.
-- Handle multiple products with mixed stock levels.
-- Unit tests to ensure the correctness of the reordering logic.
-- Acceptance tests using Gherkin syntax.
+## Projectstructuur
+- **UnitTest.cs**: Bevat unit tests voor de herbestellogica.
+- **Product.feature**: Bevat acceptatietests in Gherkin-syntaxis.
+- **Product.cs**: Definieert de `Product`-klasse.
+- **IProductService.cs**: Definieert de `IProductService`-interface.
+- **MockProductService.cs**: Mock-implementatie van `IProductService`.
+- **Reorder.cs**: Bevat de logica om te bepalen welke producten moeten worden herbesteld.
+- **ReorderStepDefinition.cs**: Stapdefinities voor het Gherkin-featurebestand.
+- **ClassDiagram.puml**: Bevat het klassenoverzicht, te bekijken met PlantUML.
 
-## Project Structure
-
-- **UnitTest.cs**: Contains unit tests for the reordering logic.
-- **Product.feature**: Contains acceptance tests written in Gherkin syntax.
-- **Product.cs**: Defines the `Product` class.
-- **IProductService.cs**: Defines the `IProductService` interface.
-- **MockProductService.cs**: A mock implementation of `IProductService`.
-- **Reorder.cs**: Contains the logic to determine which products need to be reordered.
-- **ReorderStepDefinition.cs**: Step definitions for the Gherkin feature file.
-
-## Class Diagram
-
-The class diagram for this project can be found in the `ClassDiagram.puml` file. You can view it using PlantUML.
-
-## Getting Started
-
-### Prerequisites
-
+## Installatie
+### Vereisten
 - .NET 8
-- Visual Studio or Visual Studio Code
-- PlantUML (for viewing the class diagram)
+- Visual Studio of Visual Studio Code
+- PlantUML (voor het bekijken van het klassenoverzicht)
 
-### Running the Tests
+### Tests uitvoeren
+1. Open de oplossing in Visual Studio.
+2. Bouw de oplossing om de afhankelijkheden te herstellen.
+3. Voer de unit tests uit met de Test Explorer.
 
-1. Open the solution in Visual Studio.
-2. Build the solution to restore the dependencies.
-3. Run the unit tests using the Test Explorer.
+### Acceptatietests uitvoeren
+1. Open de oplossing in Visual Studio.
+2. Bouw de oplossing om de afhankelijkheden te herstellen.
+3. Voer de acceptatietests uit met de Test Explorer.
 
-### Running the Acceptance Tests
+## Gebruik
+Om het herbestelsysteem te gebruiken, maak je een instantie van de `Reorder`-klasse en geef je een implementatie van `IProductService` door. Roep de methode `DetermineReorder` aan om de lijst met producten te verkrijgen die moeten worden herbesteld.
 
-1. Open the solution in Visual Studio.
-2. Build the solution to restore the dependencies.
-3. Run the acceptance tests using the Test Explorer.
-
-## Usage
-
-To use the reordering system, create an instance of the `Reorder` class and pass an implementation of `IProductService` to it. Call the `DetermineReorder` method to get the list of products that need to be reordered.
-
-
-## Test Scenarios
-
+## Testscenario's
 ### Unit Tests
+1. **DetermineReorder_Returns_EmptyList_WhenStockSufficient**  
+   Beschrijving: Verifieert dat geen producten worden toegevoegd aan de herbestellijst wanneer de huidige voorraad voldoende is.  
+   Testgegevens:  
+   - Playstation 5: HuidigeVoorraad = 30, MinVoorraad = 12, VerwachteVraag = 5  
+   - iPhone 14: HuidigeVoorraad = 30, MinVoorraad = 10, VerwachteVraag = 5  
+   - Zenbook: HuidigeVoorraad = 20, MinVoorraad = 18, VerwachteVraag = 5  
+   Verwachte resultaat: De herbestellijst moet leeg zijn.
 
-1. **DetermineReorder_Returns_EmptyList_WhenStockSufficient**
-   - **Description**: Verifies that no products are added to the reorder list when the current stock is sufficient.
-   - **Test Data**:
-     - Playstation 5: CurrentStock = 30, MinStock = 12, ExpectedDemand = 5
-     - iPhone 14: CurrentStock = 30, MinStock = 10, ExpectedDemand = 5
-     - Zenbook: CurrentStock = 20, MinStock = 18, ExpectedDemand = 5
-   - **Expected Result**: The reorder list should be empty.
+2. **DetermineReorder_Returns_ExceptionWhenCurrentStock_LessThan_0**  
+   Beschrijving: Verifieert dat een uitzondering wordt gegenereerd wanneer de huidige voorraad kleiner is dan 0.  
+   Testgegevens:  
+   - JBL Speaker: HuidigeVoorraad = -1, MinVoorraad = 3, VerwachteVraag = 20  
+   Verwachte resultaat: Een `ArgumentException` moet worden gegenereerd.
 
-2. **DetermineReorder_Returns_ExceptionWhenCurrentStock_LessThan_0**
-   - **Description**: Verifies that an exception is thrown when the current stock is less than 0.
-   - **Test Data**:
-     - JBL Speaker: CurrentStock = -1, MinStock = 3, ExpectedDemand = 20
-   - **Expected Result**: An `ArgumentException` should be thrown.
+3. **DetermineReorder_AddsProductToReorderList_WhenCurrentStockLessThanMinStock**  
+   Beschrijving: Verifieert dat een product wordt toegevoegd aan de herbestellijst wanneer de huidige voorraad lager is dan de minimale voorraad.  
+   Testgegevens:  
+   - JBL Speaker: HuidigeVoorraad = 2, MinVoorraad = 3, VerwachteVraag = 20  
+   Verwachte resultaat: De herbestellijst moet "JBL Speaker" bevatten.
 
-3. **DetermineReorder_AddsProductToReorderList_WhenCurrentStockLessThanMinStock**
-   - **Description**: Verifies that a product is added to the reorder list when the current stock is less than the minimum stock.
-   - **Test Data**:
-     - JBL Speaker: CurrentStock = 2, MinStock = 3, ExpectedDemand = 20
-   - **Expected Result**: The reorder list should contain "JBL Speaker".
+4. **DetermineReorder_DoesNotAddProductToReorderList_WhenCurrentStockGreaterThanMinStock**  
+   Beschrijving: Verifieert dat een product niet wordt toegevoegd aan de herbestellijst wanneer de huidige voorraad hoger is dan de minimale voorraad.  
+   Testgegevens:  
+   - JBL Speaker: HuidigeVoorraad = 4, MinVoorraad = 3, VerwachteVraag = 20  
+   Verwachte resultaat: De herbestellijst moet leeg zijn.
 
-4. **DetermineReorder_DoesNotAddProductToReorderList_WhenCurrentStockGreaterThanMinStock**
-   - **Description**: Verifies that a product is not added to the reorder list when the current stock is greater than the minimum stock.
-   - **Test Data**:
-     - JBL Speaker: CurrentStock = 4, MinStock = 3, ExpectedDemand = 20
-   - **Expected Result**: The reorder list should be empty.
+5. **DetermineReorder_HandlesMultipleProductsWithMixedStockLevels**  
+   Beschrijving: Verifieert dat de herbestellijst correct wordt bepaald voor meerdere producten met gemengde voorraadniveaus.  
+   Testgegevens:  
+   - JBL Speaker: HuidigeVoorraad = 2, MinVoorraad = 3, VerwachteVraag = 20  
+   - Playstation 5: HuidigeVoorraad = 30, MinVoorraad = 12, VerwachteVraag = 5  
+   - iPhone 14: HuidigeVoorraad = 10, MinVoorraad = 10, VerwachteVraag = 5  
+   - Zenbook: HuidigeVoorraad = 20, MinVoorraad = 18, VerwachteVraag = 5  
+   Verwachte resultaat: De herbestellijst moet "JBL Speaker" bevatten.
 
-5. **DetermineReorder_HandlesMultipleProductsWithMixedStockLevels**
-   - **Description**: Verifies that the reorder list is correctly determined for multiple products with mixed stock levels.
-   - **Test Data**:
-     - JBL Speaker: CurrentStock = 2, MinStock = 3, ExpectedDemand = 20
-     - Playstation 5: CurrentStock = 30, MinStock = 12, ExpectedDemand = 5
-     - iPhone 14: CurrentStock = 10, MinStock = 10, ExpectedDemand = 5
-     - Zenbook: CurrentStock = 20, MinStock = 18, ExpectedDemand = 5
-   - **Expected Result**: The reorder list should contain "JBL Speaker".
+### Acceptatietests
+1. **Geen producten hoeven te worden herbesteld**  
+   Scenario: Geen producten hoeven te worden herbesteld.  
+   Gegeven:  
+   - Playstation 5: HuidigeVoorraad = 10, MinVoorraad = 5, VerwachteVraag = 20  
+   - Xbox Series X: HuidigeVoorraad = 15, MinVoorraad = 10, VerwachteVraag = 15  
+   Wanneer: Ik de herbestellijst bepaal.  
+   Dan: De herbestellijst moet leeg zijn.
 
-### Acceptance Tests
+2. **Een product moet worden herbesteld**  
+   Scenario: Een product moet worden herbesteld.  
+   Gegeven:  
+   - Playstation 5: HuidigeVoorraad = 2, MinVoorraad = 5, VerwachteVraag = 20  
+   - Xbox Series X: HuidigeVoorraad = 15, MinVoorraad = 10, VerwachteVraag = 15  
+   Wanneer: Ik de herbestellijst bepaal.  
+   Dan: De herbestellijst moet "Playstation 5" bevatten.
 
-1. **No products need to be reordered**
-   - **Scenario**: No products need to be reordered.
-   - **Given**:
-     - Playstation 5: CurrentStock = 10, MinStock = 5, ExpectedDemand = 20
-     - Xbox Series X: CurrentStock = 15, MinStock = 10, ExpectedDemand = 15
-   - **When**: I determine the reorder list.
-   - **Then**: The reorder list should be empty.
+3. **Productvoorraad is gelijk aan minimale voorraad**  
+   Scenario: Productvoorraad is gelijk aan minimale voorraad.  
+   Gegeven:  
+   - Playstation 5: HuidigeVoorraad = 5, MinVoorraad = 5, VerwachteVraag = 20  
+   - Xbox Series X: HuidigeVoorraad = 15, MinVoorraad = 10, VerwachteVraag = 15  
+   Wanneer: Ik de herbestellijst bepaal.  
+   Dan: De herbestellijst moet leeg zijn.
 
-2. **A product needs to be reordered**
-   - **Scenario**: A product needs to be reordered.
-   - **Given**:
-     - Playstation 5: CurrentStock = 2, MinStock = 5, ExpectedDemand = 20
-     - Xbox Series X: CurrentStock = 15, MinStock = 10, ExpectedDemand = 15
-   - **When**: I determine the reorder list.
-   - **Then**: The reorder list should contain "Playstation 5".
+4. **Productvoorraad is groter dan minimale voorraad**  
+   Scenario: Productvoorraad is groter dan minimale voorraad.  
+   Gegeven:  
+   - Playstation 5: HuidigeVoorraad = 6, MinVoorraad = 5, VerwachteVraag = 20  
+   - Xbox Series X: HuidigeVoorraad = 15, MinVoorraad = 10, VerwachteVraag = 15  
+   Wanneer: Ik de herbestellijst bepaal.  
+   Dan: De herbestellijst moet leeg zijn.
 
-3. **Product stock equals minimum stock**
-   - **Scenario**: Product stock equals minimum stock.
-   - **Given**:
-     - Playstation 5: CurrentStock = 5, MinStock = 5, ExpectedDemand = 20
-     - Xbox Series X: CurrentStock = 15, MinStock = 10, ExpectedDemand = 15
-   - **When**: I determine the reorder list.
-   - **Then**: The reorder list should be empty.
+5. **Meerdere producten met gemengde voorraadniveaus**  
+   Scenario: Meerdere producten met gemengde voorraadniveaus.  
+   Gegeven:  
+   - Playstation 5: HuidigeVoorraad = 2, MinVoorraad = 5, VerwachteVraag = 20  
+   - Xbox Series X: HuidigeVoorraad = 30, MinVoorraad = 10, VerwachteVraag = 15  
+   Wanneer: Ik de herbestellijst bepaal.  
+   Dan: De herbestellijst moet "Playstation 5" bevatten.
 
-4. **Product stock is greater than minimum stock**
-   - **Scenario**: Product stock is greater than minimum stock.
-   - **Given**:
-     - Playstation 5: CurrentStock = 6, MinStock = 5, ExpectedDemand = 20
-     - Xbox Series X: CurrentStock = 15, MinStock = 10, ExpectedDemand = 15
-   - **When**: I determine the reorder list.
-   - **Then**: The reorder list should be empty.
+## Structuur en testaanpak
+De projectstructuur is ontworpen om de logica en functionaliteiten te scheiden. Unit tests zijn ontwikkeld om elke specifieke methode en situatie te testen, terwijl acceptatietests de eindgebruikersscenario's simuleren. Door deze combinatie wordt zowel technische nauwkeurigheid als gebruiksvriendelijkheid gewaarborgd.
 
-5. **Multiple products with mixed stock levels**
-   - **Scenario**: Multiple products with mixed stock levels.
-   - **Given**:
-     - Playstation 5: CurrentStock = 2, MinStock = 5, ExpectedDemand = 20
-     - Xbox Series X: CurrentStock = 30, MinStock = 10, ExpectedDemand = 15
-   - **When**: I determine the reorder list.
-   - **Then**: The reorder list should contain "Playstation 5".
-
-## Contributing
-
-Contributions are welcome! Please fork the repository and submit a pull request with your changes.
-
-## License
-
-This project is licensed under the MIT License. See the `LICENSE` file for details.
-
-## Contact
-
-For any questions or suggestions, please open an issue in the repository.
