@@ -1,0 +1,55 @@
+@startuml
+class Product {
+    - Name: string
+    - CurrentStock: int
+    - MinStock: int
+    - ExpectedDemand: int
+}
+
+interface IProductService {
+    + Url: string
+    + GetProducts(): List<Product>
+}
+
+class MockProductService {
+    - _url: string
+    - _products: List<Product>
+    + MockProductService(url: string)
+    + SetProducts(products: List<Product>)
+    + GetProducts(): List<Product>
+    + Url: string { get; set; }
+}
+
+class Reorder {
+    - _productService: IProductService
+    + Reorder(productService: IProductService)
+    + DetermineReorder(): List<Product>
+}
+
+class ReorderStepDefinition {
+    - mockoonUrl: string
+    - _productService: IProductService
+    - _reorder: Reorder
+    - _reorderList: List<Product>
+    - _products: List<Product>
+    + ReorderStepDefinition()
+    + GivenTheProductHasAStock(name: string, currentStock: int, minStock: int, expectedDemand: int)
+    + WhenIDetermineTheReorderList()
+    + ThenTheReorderListShouldBeEmpty()
+    + ThenTheReorderListShouldContain(expectedProductName: string)
+}
+
+class UnitTest {
+    + DetermineReorder_Returns_EmptyList_WhenStockSuffictient()
+    + DetermineReorder_Returns_ExceptionWhenCurrentStock_LessThen_0()
+    + DetermineReorder_AddsProductToReorderList_WhenCurrentStockLessThanMinStock()
+    + DetermineReorder_DoesNotAddProductToReorderList_WhenCurrentStockGreaterThanMinStock()
+    + DetermineReorder_HandlesMultipleProductsWithMixedStockLevels()
+}
+
+Product <|-- MockProductService
+IProductService <|.. MockProductService
+IProductService <|-- Reorder
+Reorder <|-- ReorderStepDefinition
+@enduml
+     
